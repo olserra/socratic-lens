@@ -1,4 +1,4 @@
-import type { ReasoningItem } from "./types.js";
+import type { AnalysisMode, ReasoningItem } from "./types.js";
 
 const RISK_HINTS = [
   "always",
@@ -95,7 +95,17 @@ function classify(line: string): ReasoningItem {
   };
 }
 
-function scoreForSorting(item: ReasoningItem): number {
+function scoreForSorting(item: ReasoningItem, mode: AnalysisMode): number {
+  if (mode === "risk_review") {
+    if (item.category === "Potential Logical Risks") {
+      return 1;
+    }
+    if (item.category === "Assumptions to Verify") {
+      return 2;
+    }
+    return 3;
+  }
+
   if (item.category === "Core Premises") {
     return 1;
   }
@@ -105,7 +115,10 @@ function scoreForSorting(item: ReasoningItem): number {
   return 3;
 }
 
-export function analyzeReasoning(rawReasoning: string): ReasoningItem[] {
+export function analyzeReasoning(
+  rawReasoning: string,
+  mode: AnalysisMode = "explainability"
+): ReasoningItem[] {
   const lines = splitReasoning(rawReasoning);
 
   if (lines.length === 0) {
@@ -119,25 +132,42 @@ export function analyzeReasoning(rawReasoning: string): ReasoningItem[] {
     ];
   }
 
-  return lines.map(classify).sort((a, b) => scoreForSorting(a) - scoreForSorting(b));
+  return lines
+    .map(classify)
+    .sort((a, b) => scoreForSorting(a, mode) - scoreForSorting(b, mode));
 }
 
-export function renderMarkdownTable(items: ReasoningItem[]): string {
+export function renderMarkdownTable(
+  items: ReasoningItem[],
+  mode: AnalysisMode = "explainability"
+): string {
   const header = [
     "| Category | Statement | Confidence | Why this label? |",
     "|---|---|---|---|"
   ];
 
+  const categoryLabel: Record<ReasoningItem["category"], string> = {
+    "Core Premises": "🔵 Core Premises",
+    "Assumptions to Verify": "🟡 Assumptions to Verify",
+    "Potential Logical Risks": "🔴 Potential Logical Risks"
+  };
+
   const rows = items.map((item) => {
     const safeStatement = item.statement.replace(/\|/g, "\\|").trim();
     const safeRationale = item.rationale.replace(/\|/g, "\\|").trim();
-    return `| ${item.category} | ${safeStatement} | ${item.confidence} | ${safeRationale} |`;
+    return `| **${categoryLabel[item.category]}** | ${safeStatement} | ${item.confidence} | ${safeRationale} |`;
   });
 
   return [
     "# SocraticLens Analysis",
     "",
     "Structured metacognitive breakdown of the provided reasoning:",
+    `Focus mode: **${mode === "risk_review" ? "Risk Review" : "Explainability Review"}**`,
+    "",
+    "## Category Legend",
+    "- 🔵 **Verified Fact / Core Premise**: evidence-oriented statement that can anchor reasoning.",
+    "- 🟡 **Assumption to Verify**: plausible step that still needs human validation.",
+    "- 🔴 **Potential Logical Risk**: weak leap, over-generalization, or hallucination-prone fragment.",
     "",
     ...header,
     ...rows,

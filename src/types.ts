@@ -3,6 +3,8 @@ export type ReasoningCategory =
   | "Assumptions to Verify"
   | "Potential Logical Risks";
 
+export type AnalysisMode = "explainability" | "risk_review";
+
 export interface ReasoningItem {
   category: ReasoningCategory;
   statement: string;
