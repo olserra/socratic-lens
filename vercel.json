@@ -9,11 +9,19 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/api/health"
+      "destination": "/api/health.ts"
     },
     {
       "source": "/mcp",
-      "destination": "/api/mcp"
+      "destination": "/api/mcp.ts"
+    },
+    {
+      "source": "/api/health",
+      "destination": "/api/health.ts"
+    },
+    {
+      "source": "/api/mcp",
+      "destination": "/api/mcp.ts"
     }
   ]
 }
