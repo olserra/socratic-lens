@@ -64,6 +64,7 @@ Add to `claude_desktop_config.json`:
 Input:
 
 - `raw_reasoning`: string
+- `analysis_mode` (optional): `"explainability" | "risk_review"`
 
 Output:
 
@@ -72,6 +73,36 @@ Output:
   - Statement
   - Confidence
   - Why this label?
+
+Behavior by mode:
+
+- `explainability` (default): orders results as 🔵 Core Premises -> 🟡 Assumptions -> 🔴 Risks
+- `risk_review`: orders results as 🔴 Risks -> 🟡 Assumptions -> 🔵 Core Premises
+
+### Example Tool Calls
+
+Explainability-first (default):
+
+```json
+{
+  "tool": "analyze_reasoning",
+  "arguments": {
+    "raw_reasoning": "Revenue dropped 12% in Q2 while churn increased in the SMB segment. If support latency keeps rising, churn may accelerate next quarter."
+  }
+}
+```
+
+Risk-first review:
+
+```json
+{
+  "tool": "analyze_reasoning",
+  "arguments": {
+    "raw_reasoning": "Everyone will migrate quickly once we launch feature X, so retention will certainly recover in one month.",
+    "analysis_mode": "risk_review"
+  }
+}
+```
 
 ## Deploy on Vercel
 
