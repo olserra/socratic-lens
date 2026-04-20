@@ -1,109 +1,103 @@
-Este README foi desenhado para posicionar o projeto como algo **sério, científico e de alta utilidade**. Ele foca na **Metacognição** e na **Interpretabilidade**, os termos que atraem tanto investidores como orientadores de doutoramento.
+# SocraticLens-MCP
 
----
+The metacognitive layer for Human-AI collaboration.
 
-# `README.md`
+SocraticLens is an MCP (Model Context Protocol) server that transforms opaque reasoning text into a structured, auditable view.
 
-# SocraticLens-MCP 🔍
-### The Metacognitive Layer for Human-AI Collaboration
+It exposes one MCP tool, `analyze_reasoning`, which classifies content into:
 
-**SocraticLens** is an open-source MCP (Model Context Protocol) server designed to combat "Cognitive Atrophy" by transforming raw, opaque AI reasoning into a structured, auditable, and metacognitive framework.
+- Core Premises
+- Assumptions to Verify
+- Potential Logical Risks
 
-Built for **Claude Desktop**, SocraticLens acts as a "Socratic Mirror," forcing the AI to categorize its own thoughts into **Premises, Uncertainties, and Logical Leaps** before delivering a final answer.
+The output is optimized for readability in markdown-based artifact windows.
 
----
+## Tech Stack
 
-## 🧠 Why SocraticLens?
+- Node.js 20+
+- TypeScript
+- @modelcontextprotocol/sdk
+- Vercel Serverless Functions (for HTTP deploy)
 
-As LLMs become more autonomous (e.g., Claude 3.5/4, OpenAI o1), the gap between "AI Thinking" and "Human Understanding" is widening.
-* **The Problem:** Users tend to accept AI outputs passively, leading to cognitive atrophy and undetected hallucinations.
-* **The Solution:** A syntax of transparency. SocraticLens parses raw "Chain-of-Thought" (CoT) data and re-renders it into a high-signal dashboard, keeping the human **meaningfully in the loop**.
+## Features Implemented
 
----
+- MCP server over stdio (for local Claude Desktop integration)
+- MCP server over HTTP streamable transport (for Vercel)
+- Heuristic Socratic parser with metacognitive classification
+- Markdown table output for high-signal review
+- Health endpoint for production monitoring
 
-## ✨ Key Features
+## Quick Start
 
-* **Logic Parsing:** Automatically strips verbal "fluff" from AI reasoning.
-* **Metacognitive Labeling:** Categorizes thoughts into:
-    * 🔵 **Verified Fact:** Data points with high-confidence sources.
-    * 🟡 **Assumption:** Necessary leaps that require human validation.
-    * 🔴 **Risk Zone:** Potential hallucinations or weak logical connections.
-* **Active Intervention:** Enables users to spot and correct a logic branch *before* the final output is generated.
-* **Minimalist UI:** Designed for high-performance professionals (Executives, Researchers, Engineers) who value clarity over noise.
+### 1. Install and build
 
----
-
-## 🛠 Technical Architecture
-
-SocraticLens is built on the **Model Context Protocol (MCP)**, allowing it to integrate directly with the Claude Desktop app.
-
-* **Runtime:** Node.js / TypeScript
-* **Protocol:** MCP (Model Context Protocol)
-* **Engine:** Socratic Syntax Parser (extracts structural intent from unstructured CoT)
-
----
-
-## 🚀 Quick Start
-
-### 1. Installation
-Clone the repository and install dependencies:
 ```bash
-git clone https://github.com/your-username/socratic-lens-mcp.git
-cd socratic-lens-mcp
 npm install
 npm run build
 ```
 
-### 2. Configure Claude Desktop
-Add the server to your `claude_desktop_config.json`:
+### 2. Run locally (stdio)
+
+```bash
+npm start
+```
+
+### 3. Claude Desktop configuration
+
+Add to `claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
     "socratic-lens": {
       "command": "node",
-      "args": ["/path/to/socratic-lens-mcp/build/index.js"]
+      "args": ["/absolute/path/to/socratic-lens/build/src/index.js"]
     }
   }
 }
 ```
 
-### 3. Usage
-Ask Claude a complex problem and trigger the lens:
-*"Analyze the impact of [X] using SocraticLens."*
+## MCP Tool
 
----
+### analyze_reasoning
 
-## 🎓 Academic & Scientific Context
+Input:
 
-This project is part of a PhD research initiative focused on **Human-Centric AI and Cognitive Sovereignty**. We are exploring how the spatial and structural externalization of AI reasoning impacts:
-1.  **Trust Calibration:** Do users trust AI more or less when they see the "sausage being made"?
-2.  **Error Detection:** Does structured text improve the rate of human-led hallucination spotting?
-3.  **Agency:** Does metacognitive feedback prevent the loss of critical thinking skills in high-stakes environments?
+- `raw_reasoning`: string
 
----
+Output:
 
-## 🤝 Contributing
+- Markdown analysis table with columns:
+  - Category
+  - Statement
+  - Confidence
+  - Why this label?
 
-We welcome contributions from Cognitive Scientists, UX Designers, and AI Engineers. This is an **Open Core** project—we believe the syntax of transparency should be a public good.
+## Deploy on Vercel
 
----
+This project includes:
 
-## 📄 License
+- `api/mcp.ts` (MCP HTTP endpoint)
+- `api/health.ts` (health check)
+- `vercel.json` route mapping
 
-MIT License.
+After linking project on Vercel:
 
----
+```bash
+vercel --prod
+```
 
-## ✉️ Contact & Research Collaboration
+Default routes:
 
-**[Seu Nome]**
-*Ex-Head of AI | PhD Researcher | Specialist in Human-AI Interaction*
-[Link para LinkedIn/Site]
+- `/` -> health
+- `/mcp` -> MCP endpoint
 
----
+## Development Scripts
 
-### Próximo Passo:
-Agora, podes copiar este conteúdo para o teu GitHub e, em seguida, passar o seguinte prompt para o teu agente de código (Copilot/Cursor):
+- `npm run dev`: run TypeScript directly
+- `npm run build`: compile to `build/`
+- `npm run check`: typecheck only
 
-> "Using the MCP TypeScript SDK, create a server that implements a tool called `analyze_reasoning`. This tool should take a raw string of text (the AI's thought process) and use a structured template to return a Markdown Table. The table must categorize the input into: 'Core Premises', 'Assumptions to Verify', and 'Potential Logical Risks'. Ensure the output is formatted for optimal readability in the Claude Desktop Artifacts window."
+## License
+
+MIT
