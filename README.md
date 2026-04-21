@@ -27,6 +27,18 @@ The output is optimized for readability in markdown-based artifact windows.
 - Markdown table output for high-signal review
 - Health endpoint for production monitoring
 
+## Architecture
+
+This repository follows a shared-core + adapters structure (similar to multi-platform plugin projects):
+
+- Core logic: `src/core/` (reasoning classification + markdown rendering)
+- MCP adapter: `src/adapters/mcp/` (tool registration and schema)
+- Runtime entrypoints:
+  - `src/index.ts` for stdio clients (Claude Desktop/local)
+  - `api/mcp.ts` for HTTP MCP clients (remote)
+
+Detailed notes: `docs/ARCHITECTURE.md`
+
 ## Quick Start
 
 ### 1. Install and build
@@ -122,6 +134,30 @@ Default routes:
 
 - `/` -> health
 - `/mcp` -> MCP endpoint
+
+Important:
+
+- `/mcp` is an MCP protocol endpoint, not a human-facing web page.
+- If you open it in a browser (or plain `curl`), a `406 Not Acceptable` is expected unless the client sends `Accept: text/event-stream`.
+- For quick human checks, use `/` (health) instead.
+
+Example protocol-aware check:
+
+```bash
+curl -i https://socratic-lens.vercel.app/mcp -H "Accept: text/event-stream"
+```
+
+## Do We Need Vercel?
+
+No. Most MCP setups (especially Claude Desktop) run over local stdio and do not require Vercel.
+
+Use Vercel only if you want a remote/shared MCP endpoint for multiple clients.
+
+## Using with Other LLM Clients
+
+- Claude Desktop: use local stdio process (recommended default).
+- Codex or other MCP-capable clients: use either local stdio or remote `/mcp` endpoint.
+- If your client supports MCP over HTTP/SSE, point it to the deployed endpoint.
 
 ## Development Scripts
 
