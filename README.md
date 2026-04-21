@@ -17,15 +17,12 @@ The output is optimized for readability in markdown-based artifact windows.
 - Node.js 20+
 - TypeScript
 - @modelcontextprotocol/sdk
-- Vercel Serverless Functions (for HTTP deploy)
 
 ## Features Implemented
 
 - MCP server over stdio (for local Claude Desktop integration)
-- MCP server over HTTP streamable transport (for Vercel)
 - Heuristic Socratic parser with metacognitive classification
 - Markdown table output for high-signal review
-- Health endpoint for production monitoring
 
 ## Architecture
 
@@ -35,7 +32,6 @@ This repository follows a shared-core + adapters structure (similar to multi-pla
 - MCP adapter: `src/adapters/mcp/` (tool registration and schema)
 - Runtime entrypoints:
   - `src/index.ts` for stdio clients (Claude Desktop/local)
-  - `api/mcp.ts` for HTTP MCP clients (remote)
 
 Detailed notes: `docs/ARCHITECTURE.md`
 
@@ -116,55 +112,17 @@ Risk-first review:
 }
 ```
 
-## Deploy on Vercel
-
-This project includes:
-
-- `api/mcp.ts` (MCP HTTP endpoint)
-- `api/health.ts` (health check)
-- `vercel.json` route mapping
-
-After linking project on Vercel:
-
-```bash
-vercel --prod
-```
-
-Default routes:
-
-- `/` -> health
-- `/mcp` -> MCP endpoint
-
-Important:
-
-- `/mcp` is an MCP protocol endpoint, not a human-facing web page.
-- If you open it in a browser (or plain `curl`), a `406 Not Acceptable` is expected unless the client sends `Accept: text/event-stream`.
-- For quick human checks, use `/` (health) instead.
-
-Example protocol-aware check:
-
-```bash
-curl -i https://socratic-lens.vercel.app/mcp -H "Accept: text/event-stream"
-```
-
-## Do We Need Vercel?
-
-No. Most MCP setups (especially Claude Desktop) run over local stdio and do not require Vercel.
-
-Use Vercel only if you want a remote/shared MCP endpoint for multiple clients.
-
 ## Using with Other LLM Clients
 
 - Claude Desktop: use local stdio process (recommended default).
-- Codex or other MCP-capable clients: use either local stdio or remote `/mcp` endpoint.
-- If your client supports MCP over HTTP/SSE, point it to the deployed endpoint.
+- Codex or other MCP-capable clients: use local stdio process.
+- OpenCode and similar clients: use local stdio process.
 
 Client setup guide: `docs/CLIENT-INTEGRATIONS.md`
 
 Config templates:
 
 - `examples/mcpServers.local.json`
-- `examples/mcpServers.remote.json`
 
 ## Development Scripts
 

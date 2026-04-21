@@ -1,16 +1,13 @@
 # Client Integrations
 
-This project is an MCP server and can be consumed by any client that supports MCP over stdio or HTTP.
+This project is an MCP server consumed via local stdio.
 
-## Recommended Integration Modes
+## Recommended Integration Mode
 
 1. Local stdio (most reliable)
+
 - Best for Claude Desktop and local developer workflows.
 - Uses local process execution.
-
-2. Remote HTTP endpoint
-- Best when you want one hosted endpoint for multiple clients.
-- Uses `https://socratic-lens.vercel.app/mcp`.
 
 ## Claude Desktop
 
@@ -23,7 +20,7 @@ npm install
 npm run build
 ```
 
-2. Add server config to your Claude Desktop MCP settings:
+1. Add server config to your Claude Desktop MCP settings:
 
 ```json
 {
@@ -43,22 +40,14 @@ Template file: `examples/mcpServers.local.json`
 Many coding clients use an `mcpServers`-style schema.
 
 - Local process template: `examples/mcpServers.local.json`
-- Remote endpoint template: `examples/mcpServers.remote.json`
-
-If your client supports MCP over HTTP/SSE, use:
-
-- `https://socratic-lens.vercel.app/mcp`
-
-Note: If you open `/mcp` in a browser without MCP headers, you may see `406 Not Acceptable`. That is expected for protocol endpoints.
 
 ## OpenCode
 
 Use the same MCP server definitions from `examples/` in OpenCode's MCP configuration.
 
-- Prefer local stdio for development.
-- Use remote URL for shared access.
+- Use local stdio.
 
-Because OpenCode versions can vary, map the values to its MCP config keys (`command` + `args` for local, or `url` for remote).
+Because OpenCode versions can vary, map the values to its MCP config keys (`command` + `args`).
 
 ## Ollama
 
@@ -69,7 +58,7 @@ To use SocraticLens with Ollama, connect through an MCP-capable host layer (for 
 Practical pattern:
 
 1. Host LLM with Ollama.
-2. Run SocraticLens as MCP server (local or remote).
+2. Run SocraticLens as local MCP stdio server.
 3. Use an MCP-capable orchestrator/client that can access both.
 
 ## Tool Contract

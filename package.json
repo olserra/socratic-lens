@@ -8,14 +8,12 @@
     "build": "tsc -p tsconfig.json",
     "start": "node build/src/index.js",
     "dev": "tsx src/index.ts",
-    "check": "tsc --noEmit",
-    "vercel-build": "npm run build"
+    "check": "tsc --noEmit"
   },
   "keywords": [
     "mcp",
     "model-context-protocol",
     "typescript",
-    "vercel",
     "metacognition"
   ],
   "license": "MIT",
@@ -28,7 +26,6 @@
   },
   "devDependencies": {
     "@types/node": "^22.13.5",
-    "@vercel/node": "^5.7.12",
     "tsx": "^4.19.3",
     "typescript": "^5.7.3"
   }
