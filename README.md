@@ -159,6 +159,13 @@ Use Vercel only if you want a remote/shared MCP endpoint for multiple clients.
 - Codex or other MCP-capable clients: use either local stdio or remote `/mcp` endpoint.
 - If your client supports MCP over HTTP/SSE, point it to the deployed endpoint.
 
+Client setup guide: `docs/CLIENT-INTEGRATIONS.md`
+
+Config templates:
+
+- `examples/mcpServers.local.json`
+- `examples/mcpServers.remote.json`
+
 ## Development Scripts
 
 - `npm run dev`: run TypeScript directly

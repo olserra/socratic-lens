@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "socratic-lens": {
+      "command": "node",
+      "args": ["/absolute/path/to/socratic-lens/build/src/index.js"]
+    }
+  }
+}
