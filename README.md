@@ -81,6 +81,8 @@ Output:
   - Statement
   - Confidence
   - Why this label?
+- Action Protocol IDs in statements (`P#`, `A#`, `R#`)
+- Action Protocol section with intervention tokens (`ACCEPT`, `VERIFY`, `CHALLENGE`)
 
 Behavior by mode:
 
@@ -129,6 +131,7 @@ Config templates:
 - `npm run dev`: run TypeScript directly
 - `npm run build`: compile to `build/`
 - `npm run check`: typecheck only
+- `npm test`: run core analysis tests
 
 ## License
 

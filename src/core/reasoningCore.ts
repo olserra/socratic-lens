@@ -1,4 +1,4 @@
-import type { AnalysisMode, ReasoningItem } from "../types.js";
+import type { AnalysisMode, ReasoningCategory, ReasoningItem } from "../types.js";
 
 const RISK_HINTS = [
   "always",
@@ -115,6 +115,39 @@ function scoreForSorting(item: ReasoningItem, mode: AnalysisMode): number {
   return 3;
 }
 
+function idPrefix(category: ReasoningCategory): "P" | "A" | "R" {
+  if (category === "Core Premises") {
+    return "P";
+  }
+  if (category === "Assumptions to Verify") {
+    return "A";
+  }
+  return "R";
+}
+
+function assignRowIds(items: ReasoningItem[]): string[] {
+  const counters: Record<"P" | "A" | "R", number> = { P: 0, A: 0, R: 0 };
+  return items.map((item) => {
+    const prefix = idPrefix(item.category);
+    counters[prefix] += 1;
+    return `${prefix}${counters[prefix]}`;
+  });
+}
+
+function countByCategory(items: ReasoningItem[]): Record<ReasoningCategory, number> {
+  return items.reduce<Record<ReasoningCategory, number>>(
+    (acc, item) => {
+      acc[item.category] += 1;
+      return acc;
+    },
+    {
+      "Core Premises": 0,
+      "Assumptions to Verify": 0,
+      "Potential Logical Risks": 0
+    }
+  );
+}
+
 export function analyzeReasoning(
   rawReasoning: string,
   mode: AnalysisMode = "explainability"
@@ -147,15 +180,29 @@ export function renderMarkdownTable(
   ];
 
   const categoryLabel: Record<ReasoningItem["category"], string> = {
-    "Core Premises": "🔵 Core Premises",
-    "Assumptions to Verify": "🟡 Assumptions to Verify",
-    "Potential Logical Risks": "🔴 Potential Logical Risks"
+    "Core Premises": "Core Premises",
+    "Assumptions to Verify": "Assumptions to Verify",
+    "Potential Logical Risks": "Potential Logical Risks"
   };
 
-  const rows = items.map((item) => {
+  const counts = countByCategory(items);
+  const rowIds = assignRowIds(items);
+
+  const rows = items.map((item, index) => {
     const safeStatement = item.statement.replace(/\|/g, "\\|").trim();
     const safeRationale = item.rationale.replace(/\|/g, "\\|").trim();
-    return `| **${categoryLabel[item.category]}** | ${safeStatement} | ${item.confidence} | ${safeRationale} |`;
+    const traceableStatement = `[${rowIds[index]}] ${safeStatement}`;
+    return `| **${categoryLabel[item.category]}** | ${traceableStatement} | ${item.confidence} | ${safeRationale} |`;
+  });
+
+  const actionLines = rowIds.map((id) => {
+    if (id.startsWith("P")) {
+      return `- ACCEPT:${id}`;
+    }
+    if (id.startsWith("A")) {
+      return `- VERIFY:${id}`;
+    }
+    return `- CHALLENGE:${id}`;
   });
 
   return [
@@ -164,17 +211,21 @@ export function renderMarkdownTable(
     "Structured metacognitive breakdown of the provided reasoning:",
     `Focus mode: **${mode === "risk_review" ? "Risk Review" : "Explainability Review"}**`,
     "",
-    "## Category Legend",
-    "- 🔵 **Verified Fact / Core Premise**: evidence-oriented statement that can anchor reasoning.",
-    "- 🟡 **Assumption to Verify**: plausible step that still needs human validation.",
-    "- 🔴 **Potential Logical Risk**: weak leap, over-generalization, or hallucination-prone fragment.",
+    "## Summary",
+    `- Core Premises: ${counts["Core Premises"]}`,
+    `- Assumptions to Verify: ${counts["Assumptions to Verify"]}`,
+    `- Potential Logical Risks: ${counts["Potential Logical Risks"]}`,
     "",
     ...header,
     ...rows,
     "",
+    "## Action Protocol",
+    "Use these action IDs to run human-in-the-loop interventions and follow-up decisions.",
+    ...actionLines,
+    "",
     "## Suggested Human Interventions",
-    "1. Validate all **Assumptions to Verify** with concrete sources or experiments.",
-    "2. Stress-test each **Potential Logical Risks** item with counter-examples.",
-    "3. Confirm whether **Core Premises** remain valid under scope changes."
+    "1. Validate all Assumptions to Verify with concrete sources or experiments.",
+    "2. Stress-test each Potential Logical Risks item with counter-examples.",
+    "3. Confirm whether Core Premises remain valid under scope changes."
   ].join("\n");
 }

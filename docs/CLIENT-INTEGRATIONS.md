@@ -78,3 +78,8 @@ Output:
   - Core Premises
   - Assumptions to Verify
   - Potential Logical Risks
+- Statement IDs for follow-up actions (`P#`, `A#`, `R#`)
+- Action Protocol lines:
+  - `ACCEPT:P#` for core premises
+  - `VERIFY:A#` for assumptions
+  - `CHALLENGE:R#` for risks
